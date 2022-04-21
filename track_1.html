@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Map Track</title>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    </head>
+    <body>
+        <div id="origin">abc</div>
+        <div id="map" style="width: 100%; height: 300px; top: 250px; position: absolute; "></div> 
+
+        <script
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdfwObqW8MSGy0em_RjiTG33iLY-EhY2I&callback=initMap&v=weekly&channel=2"
+            async
+        ></script>       
+        <script type="text/javascript">
+
+
+            let mPolyLine;
+            function initMap() {
+                const directionsService = new google.maps.DirectionsService();
+                var origin = {lat: 30.7305, lng: 76.6814};
+                var destination = {lat: 30.7377, lng: 76.6794};
+                const map = new google.maps.Map(document.getElementById("map"), {
+                    zoom: 14,
+                    center: origin,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                });
+
+                var currentMarker = new google.maps.Marker({
+                    position: origin,
+                    map: map,
+                });
+
+                createPath(directionsService, origin, destination, map);
+
+                if (navigator.geolocation) {
+                    var options = {enableHighAccuracy:!0,timeout:3e4,maximumAge:0};
+                    navigator.geolocation.watchPosition(
+                            (position) => {
+                        origin = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                        };
+                        currentMarker.setPosition(origin);
+                        map.setCenter(origin);
+                    }, (error) => {
+                        window.alert("Error: The Geolocation service failed." + error.message + " error code: " + error.code);
+                    }, options);
+                } else {
+                    // Browser doesn't support Geolocation
+                    window.alert("Error: Your browser doesn't support geolocation.");
+                }
+            }
+
+            function createPath(directionsService, origin, destination, map) {
+                var pathPoints;
+                directionsService
+                        .route({
+                            origin: origin,
+                            destination: destination,
+                            travelMode: google.maps.TravelMode.DRIVING,
+                        })
+                        .then((response) => {
+                            pathPoints = response.routes[0].overview_path.map(function (location) {
+                                return {lat: location.lat(), lng: location.lng()};
+                            });
+
+                            console.log("pathpoints: " + JSON.stringify(pathPoints));
+
+                            mPolyLine = new google.maps.Polyline({
+                                path: pathPoints, //APPLY LIST TO PATH
+                                geodesic: true,
+                                strokeColor: '#ff0000',
+                            });
+
+                            mPolyLine.setMap(map);
+                        })
+                        .catch((e) => window.alert("Directions request failed due to " + e + ", origin: "
+                                    + origin.lat + ", " + origin.lng + ", dest: " + destination.lat + ", " + destination.lng));
+            }
+
+        </script>
+    </body>
+</html>
