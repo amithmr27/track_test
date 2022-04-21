@@ -52,7 +52,7 @@
                             });
                             if (google.maps.geometry.poly.isLocationOnEdge(origin, segmentPolyline, 10e-1)) {
                                 console.log("origin: " + JSON.stringify(origin));
-                                mPolyLine.getPath().removeAt(i);
+                                //mPolyLine.getPath().removeAt(i);
 //                                mPolyLine.setPath(mPolyLine.getPath().getAt(i + 1), mPolyLine.getPath().getAt(mPolyLine.getPath().length - 1));
                                 console.log("on track");
                                 console.log("new Path: " + JSON.stringify(mPolyLine.getPath()));
